@@ -113,3 +113,40 @@ h1 {
     background-position: -512px;
   }
 }
+
+/*animação humano*/
+
+.anima3 {
+  background-image: url(../imgs/amigo.png);
+  animation: play3 1s steps(12) infinite;
+}
+@keyframes play3 {
+  from {
+    background-position: 0px;
+  }
+  to {
+    background-position: -528px;
+  }
+}
+/* Disparo*/
+
+#disparo {
+  width: 20px;
+  height: 16px;
+  position: absolute;
+  background-image: url(../imgs/disparo.png);
+}
+
+/* Explosão */
+
+#explosao1 {
+  width: 15px;
+  height: 87px;
+  position: absolute;
+}
+
+#explosao2 {
+  width: 15px;
+  height: 87px;
+  position: absolute;
+}
