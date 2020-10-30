@@ -26,6 +26,24 @@ function start() {
 
   var energiaAtual = 3;
 
+  var somDisparo = document.getElementById('somDisparo');
+  var somExplosao = document.getElementById('somExplosao');
+  var musica = document.getElementById('musica');
+  var somGameover = document.getElementById('somGameover');
+  var somPerdido = document.getElementById('somPerdido');
+  var somResgate = document.getElementById('somResgate');
+
+  //Música em loop
+  musica.addEventListener(
+    'ended',
+    function () {
+      musica.currentTime = 0;
+      musica.play();
+    },
+    false
+  );
+  musica.play();
+
   jogo.pressionou = [];
 
   /********************** Verificar se tecla foi pressionada **********************/
@@ -127,6 +145,7 @@ function start() {
   /**********************  Função atirar ********************* */
 
   function disparo() {
+    somDisparo.play();
     if (podeAtirar == true) {
       podeAtirar = false;
 
@@ -280,6 +299,7 @@ function start() {
         velocidade = velocidade + 0.5;
         velocidade2 = velocidade2 + 0.5;
       }
+      somResgate.play();
       reposicionaAmigo();
       $('#amigo').remove();
     }
@@ -310,6 +330,8 @@ function start() {
 
     var tempoExplosao = window.setInterval(removeExplosao, 400);
 
+    somExplosao.play();
+
     function removeExplosao() {
       div.remove();
       window.clearInterval(tempoExplosao);
@@ -328,6 +350,8 @@ function start() {
     div2.animate({ width: 200, opacity: 0 }, 'slow');
 
     var tempoExplosao2 = window.setInterval(removeExplosao2, 1000);
+
+    somExplosao.play();
 
     function removeExplosao2() {
       div2.remove();
@@ -354,6 +378,8 @@ function start() {
   /********************** Explosão 3 **********************/
 
   function explosao3(amigoX, amigoY) {
+    somPerdido.play();
+
     $('#fundoGame').append("<div id='explosao3' class='anima4'></div");
     $('#explosao3').css('top', amigoY);
     $('#explosao3').css('left', amigoX);
@@ -397,7 +423,42 @@ function start() {
     if (energiaAtual == 0) {
       $('#energia').css('background-image', 'url(imgs/energia0.png)');
 
-      //Game Over
+      gameOver(); //Game Over
     }
   } /********************** Barra de Energia **********************/
-}
+
+  //Função GAME OVER
+  function gameOver() {
+    fimdejogo = true;
+    musica.pause();
+    somGameover.play();
+
+    window.clearInterval(jogo.timer); // irá para o loop do jogo
+    jogo.timer = null;
+
+    $('#jogador').remove();
+    $('#inimigo1').remove();
+    $('#inimigo2').remove();
+    $('#amigo').remove();
+
+    $('#fundoGame').append("<div id='fim'></div>");
+
+    $('#fim').html(
+      '<h1> Game Over </h1><p>Sua pontuação foi: ' +
+        pontos +
+        '</p>' +
+        '<p> Seu amigo foi salvo ' +
+        salvos +
+        ' vezes </p>' +
+        "<button id='reinicia' onClick=reiniciaJogo()><h3>Jogar Novamente</h3></button>"
+    );
+  } /********************** Fim Game Over **********************/
+} /********************** Fim Start **********************/
+
+/********************** Reinicia Jogo **********************/
+
+function reiniciaJogo() {
+  somGameover.pause();
+  $('#fim').remove();
+  start();
+} /********************** Fim Reinicia Jogo **********************/
