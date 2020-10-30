@@ -8,7 +8,7 @@ function start() {
   $('#fundoGame').append("<div id='inimigo2'></div>");
   $('#fundoGame').append("<div id='amigo' class='anima3'></div>");
 
-  /*Variáveis do jogo*/
+  /********************** Variáveis do jogo*/
 
   var jogo = {};
   var tecla = { W: 87, S: 83, D: 68 };
@@ -19,7 +19,7 @@ function start() {
 
   jogo.pressionou = [];
 
-  /*Verificar se tecla foi pressionada */
+  /********************** Verificar se tecla foi pressionada **********************/
 
   $(document).keydown(function (e /* Verifica se foi pressionado a tecla*/) {
     jogo.pressionou[e.which] = true;
@@ -28,7 +28,7 @@ function start() {
     jogo.pressionou[e.which] = false;
   });
 
-  /* Inicio loop do fundo */
+  /**********************  Inicio loop do fundo **********************/
 
   jogo.timer = setInterval(loop, 10);
 
@@ -42,14 +42,14 @@ function start() {
   }
   /* Fim loop do fundo */
 
-  /* Função para movimentar o fundo */
+  /**********************  Função para movimentar o fundo **********************/
 
   function movefundo() {
     esquerda = parseInt($('#fundoGame').css('background-position'));
     $('#fundoGame').css('background-position', esquerda - 1);
   } /* Fim função para movimentar o fundo */
 
-  /* Função para movimentar o helicoptero */
+  /**********************  Função para movimentar o helicoptero ********************* */
   function movejogador() {
     if (jogo.pressionou[tecla.W]) {
       var vertical = parseInt(
@@ -77,7 +77,7 @@ function start() {
     }
   } // fim da função movejogador()
 
-  /*Movimentar inimigo 1 */
+  /********************** Movimentar inimigo 1 ********************* */
 
   function moveinimigo1() {
     posicaoX = parseInt($('#inimigo1').css('left'));
@@ -91,7 +91,7 @@ function start() {
     }
   } // Fim da função moveinimigo1
 
-  /*Movimentar inimigo 2 */
+  /********************** Movimentar inimigo 2 ********************* */
 
   function moveinimigo2() {
     posicaoX = parseInt($('#inimigo2').css('left'));
@@ -102,7 +102,7 @@ function start() {
     }
   } // Fim da função moveinimigo2
 
-  /*Movimentar Amigo */
+  /**********************  Movimentar Amigo ********************* */
 
   function moveamigo() {
     posicaoX = parseInt($('#amigo').css('left'));
@@ -113,7 +113,7 @@ function start() {
     }
   } // fim da função moveamigo
 
-  /* Função atirar */
+  /**********************  Função atirar ********************* */
 
   function disparo() {
     if (podeAtirar == true) {
@@ -145,7 +145,7 @@ function start() {
     } // Fecha executaDisparo()
   } // Fecha disparo()
 
-  /* Colisão */
+  /**********************  Colisão ********************* */
 
   function colisao() {
     var colisao1 = $('#jogador').collision($('#inimigo1'));
@@ -155,7 +155,7 @@ function start() {
     var colisao5 = $('#jogador').collision($('#amigo'));
     var colisao6 = $('#inimigo2').collision($('#amigo'));
 
-    /*Colisão do jogador com inimigo 1 */
+    /********************** Colisão do jogador com inimigo 1 ********************* */
 
     if (colisao1.length > 0) {
       inimigo1X = parseInt($('#inimigo1').css('left'));
@@ -166,7 +166,9 @@ function start() {
       $('#inimigo1').css('left', 694);
       $('#inimigo1').css('top', posicaoY);
     }
-    // jogador com o inimigo2
+
+    /**********************  jogador com o inimigo2 ********************* */
+
     if (colisao2.length > 0) {
       inimigo2X = parseInt($('#inimigo2').css('left'));
       inimigo2Y = parseInt($('#inimigo2').css('top'));
@@ -175,7 +177,7 @@ function start() {
       $('#jogador').remove(); // remove jogador
       $('#inimigo2').remove(); // remove inimigo 2
 
-      var tempoColisao4 = window.setInterval(reposiciona4, 3000); // tempo de espera jogador = 3s
+      var tempoColisao4 = window.setInterval(reposiciona4, 5000);
       var tempoColisao5 = window.setInterval(reposiciona5, 5000); // tempo de inimigo2 jogador = 5s
 
       function reposiciona4() {
@@ -197,6 +199,43 @@ function start() {
         }
       }
     }
+
+    /********************** Dispara inimigo 1 ********************* */
+
+    if (colisao3.length > 0) {
+      inimigo1X = parseInt($('#inimigo1').css('left'));
+      inimigo1Y = parseInt($('#inimigo1').css('top'));
+
+      explosao1(inimigo1X, inimigo1Y);
+      $('#disparo').css('left', 950);
+
+      posicaoY = parseInt(Math.random() * 334) + 50;
+      $('#inimigo1').css('left', 694);
+      $('#inimigo1').css('top', posicaoY);
+    }
+    /**********************  Dispara inimigo 2   ********************* */
+
+    if (colisao4.length > 0) {
+      inimigo2X = parseInt($('#inimigo2').css('left'));
+      inimigo2Y = parseInt($('#inimigo2').css('top'));
+      $('#inimigo2').remove();
+
+      explosao2(inimigo2X, inimigo2Y);
+      $('#disparo').css('left', 950);
+
+      var tempoColisao5 = window.setInterval(reposiciona5, 5000); // tempo de inimigo2 jogador = 5s
+
+      function reposiciona5() {
+        // função para retornar inimigo2
+        window.clearInterval(tempoColisao5);
+        tempoColisao5 = null;
+
+        if (fimdejogo == false) {
+          $('#fundoGame').append('<div id=inimigo2></div');
+        }
+      }
+    }
+
     // jogador com o amigo
 
     if (colisao5.length > 0) {
@@ -205,7 +244,7 @@ function start() {
     }
   } //Fim da função colisao()
 
-  /* Explosão */
+  /**********************  Explosão ********************* */
 
   //Explosão 1
   function explosao1(inimigo1X, inimigo1Y) {
@@ -225,7 +264,7 @@ function start() {
     }
   } // Fim da função explosao1
 
-  //Explosão2
+  /********************** Explosão2********************* */
 
   function explosao2(inimigo2X, inimigo2Y) {
     $('#fundoGame').append("<div id='explosao2'></div");
