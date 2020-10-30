@@ -7,15 +7,24 @@ function start() {
   $('#fundoGame').append("<div id='inimigo1' class='anima2'></div>");
   $('#fundoGame').append("<div id='inimigo2'></div>");
   $('#fundoGame').append("<div id='amigo' class='anima3'></div>");
+  $('#fundoGame').append("<div id='placar'></div>");
+  $('#fundoGame').append("<div id='energia'></div>");
 
   /********************** Variáveis do jogo*/
 
   var jogo = {};
   var tecla = { W: 87, S: 83, D: 68 };
   var velocidade = 4;
-  var posicaoY = parseInt(Math.random() * 334);
+  var velocidade2 = 3;
+  var posicaoY = parseInt(Math.random() * 334) + 50;
   var podeAtirar = true;
   var fimdejogo = false;
+
+  var pontos = 0;
+  var salvos = 0;
+  var perdidos = 0;
+
+  var energiaAtual = 3;
 
   jogo.pressionou = [];
 
@@ -39,6 +48,8 @@ function start() {
     moveinimigo2();
     moveamigo();
     colisao();
+    placar();
+    energia();
   }
   /* Fim loop do fundo */
 
@@ -95,7 +106,7 @@ function start() {
 
   function moveinimigo2() {
     posicaoX = parseInt($('#inimigo2').css('left'));
-    $('#inimigo2').css('left', posicaoX - 3);
+    $('#inimigo2').css('left', posicaoX - velocidade2);
 
     if (posicaoX <= 0) {
       $('#inimigo2').css('left', 775);
@@ -158,6 +169,8 @@ function start() {
     /********************** Colisão do jogador com inimigo 1 ********************* */
 
     if (colisao1.length > 0) {
+      energiaAtual--;
+      pontos -= 25; // Perde pontos caso bata no helicóptero
       inimigo1X = parseInt($('#inimigo1').css('left'));
       inimigo1Y = parseInt($('#inimigo1').css('top'));
       explosao1(inimigo1X, inimigo1Y);
@@ -167,9 +180,11 @@ function start() {
       $('#inimigo1').css('top', posicaoY);
     }
 
-    /**********************  jogador com o inimigo2 ********************* */
+    /**********************  jogador com o inimigo2 **********************/
 
     if (colisao2.length > 0) {
+      energiaAtual--;
+      pontos -= 75; // Perde pontos caso bata no caminhão
       inimigo2X = parseInt($('#inimigo2').css('left'));
       inimigo2Y = parseInt($('#inimigo2').css('top'));
       explosao2(inimigo2X, inimigo2Y);
@@ -198,11 +213,13 @@ function start() {
           $('#fundoGame').append('<div id=inimigo2></div');
         }
       }
-    }
+    } /********************** Fim jogador com o inimigo2 **********************/
 
-    /********************** Dispara inimigo 1 ********************* */
+    /********************** Dispara inimigo 1 **********************/
 
     if (colisao3.length > 0) {
+      pontos += 100; // Pontuação a cada vez que acertar o helicóptero
+
       inimigo1X = parseInt($('#inimigo1').css('left'));
       inimigo1Y = parseInt($('#inimigo1').css('top'));
 
@@ -212,10 +229,13 @@ function start() {
       posicaoY = parseInt(Math.random() * 334) + 50;
       $('#inimigo1').css('left', 694);
       $('#inimigo1').css('top', posicaoY);
-    }
-    /**********************  Dispara inimigo 2   ********************* */
+    } /********************** Fim Dispara inimigo 1 **********************/
+
+    /**********************  Dispara inimigo 2  **********************/
 
     if (colisao4.length > 0) {
+      pontos += 50; // Pontuação a cada vez que acertar o caminhão
+
       inimigo2X = parseInt($('#inimigo2').css('left'));
       inimigo2Y = parseInt($('#inimigo2').css('top'));
       $('#inimigo2').remove();
@@ -234,19 +254,52 @@ function start() {
           $('#fundoGame').append('<div id=inimigo2></div');
         }
       }
-    }
+    } /********************** Fim Dispara inimigo 2   **********************/
 
-    // jogador com o amigo
+    /******************* jogador com o amigo ***************/
 
     if (colisao5.length > 0) {
+      salvos++; // Quando eu resgatar meu amigo
+      if (salvos % 5 == 0) {
+        // Ganha uma vida cada vez que resgatar 5 vezes o amigo
+        energiaAtual++;
+      }
+      /*Aumentar dificuldade */
+      if (salvos > 3) {
+        // Aumenta a dificuldade do jogo quando salvar 3 vezes o amigo
+        velocidade = velocidade + 0.5;
+        velocidade2 = velocidade2 + 0.5;
+      }
+      if (salvos > 6) {
+        // Aumenta a dificuldade do jogo quando salvar 6 vezes o amigo
+        velocidade = velocidade + 0.5;
+        velocidade2 = velocidade2 + 0.5;
+      }
+      if (salvos > 9) {
+        // Aumenta a dificuldade do jogo quando salvar 9 vezes o amigo
+        velocidade = velocidade + 0.5;
+        velocidade2 = velocidade2 + 0.5;
+      }
       reposicionaAmigo();
       $('#amigo').remove();
     }
-  } //Fim da função colisao()
 
-  /**********************  Explosão ********************* */
+    /******************* Inimigo 2 (caminhão) com amigo ***************/
 
-  //Explosão 1
+    if (colisao6.length > 0) {
+      perdidos++; // Quando o caminhão atropelar meu amigo
+      pontos -= 50;
+      amigoX = parseInt($('#amigo').css('left'));
+      amigoY = parseInt($('#amigo').css('top'));
+      explosao3(amigoX, amigoY);
+      $('#amigo').remove();
+
+      reposicionaAmigo();
+    }
+  } /******************* Fim Inimigo 2 (caminhão) com amigo ***************/
+
+  /**********************  Explosão **********************/
+
   function explosao1(inimigo1X, inimigo1Y) {
     $('#fundoGame').append("<div id='explosao1'></div");
     $('#explosao1').css('background-image', 'url(imgs/explosao.png)');
@@ -264,7 +317,7 @@ function start() {
     }
   } // Fim da função explosao1
 
-  /********************** Explosão2********************* */
+  /********************** Explosão 2 **********************/
 
   function explosao2(inimigo2X, inimigo2Y) {
     $('#fundoGame').append("<div id='explosao2'></div");
@@ -281,5 +334,70 @@ function start() {
       window.clearInterval(tempoExplosao2);
       tempoExplosao2 = null;
     }
-  } // Fim da função explosao2
+  } /********************** Fim Explosão 2 **********************/
+
+  /********************** Reposiciona Amigo **********************/
+
+  function reposicionaAmigo() {
+    var tempoAmigo = window.setInterval(reposiciona6, 3000);
+
+    function reposiciona6() {
+      window.clearInterval(tempoAmigo);
+      tempoAmigo = null;
+
+      if (fimdejogo == false) {
+        $('#fundoGame').append("<div id='amigo' class='anima3'></div>");
+      }
+    }
+  } /********************** Fim Reposiciona Amigo *********************/
+
+  /********************** Explosão 3 **********************/
+
+  function explosao3(amigoX, amigoY) {
+    $('#fundoGame').append("<div id='explosao3' class='anima4'></div");
+    $('#explosao3').css('top', amigoY);
+    $('#explosao3').css('left', amigoX);
+    var tempoExplosao3 = window.setInterval(resetaExplosao3, 1000);
+    function resetaExplosao3() {
+      $('#explosao3').remove();
+      window.clearInterval(tempoExplosao3);
+      tempoExplosao3 = null;
+    }
+  } /********************** Fim Explosão 3 **********************/
+
+  /********************** Placar **********************/
+
+  function placar() {
+    $('#placar').html(
+      '<h2> Pontos: ' +
+        pontos +
+        ' Salvos: ' +
+        salvos +
+        ' Perdidos: ' +
+        perdidos +
+        '</h2>'
+    );
+  } /********************** Fim Placar **********************/
+
+  /********************** Barra de Energia **********************/
+
+  function energia() {
+    if (energiaAtual == 3) {
+      $('#energia').css('background-image', 'url(imgs/energia3.png)');
+    }
+
+    if (energiaAtual == 2) {
+      $('#energia').css('background-image', 'url(imgs/energia2.png)');
+    }
+
+    if (energiaAtual == 1) {
+      $('#energia').css('background-image', 'url(imgs/energia1.png)');
+    }
+
+    if (energiaAtual == 0) {
+      $('#energia').css('background-image', 'url(imgs/energia0.png)');
+
+      //Game Over
+    }
+  } /********************** Barra de Energia **********************/
 }
